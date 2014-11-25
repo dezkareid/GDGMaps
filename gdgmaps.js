@@ -1,34 +1,48 @@
 calli = function () {
 	console.log("Hola");
 }
-var GDGMaps = (function (latitude, longitude, options, callback) {
-	
+var DMaps = (function (name, latitude, longitude, options, callback) {
   var self = this;
-	var callBack = undefined;
+	var callback;
+  var container;
+  var latitude;
+  var longitude;
 	var map;
-	var mapOptions = undefined;
+	var mapOptions;
 	
     var api = function() {
-      switch (arguments.length){
-        case 1 :
-          validateOneArgument(arguments);
-          break;
-        case 2 : 
-          validateTwoArguments(arguments);
-          break;
-        case 3 :
-          validateThreeArguments(arguments);
-          break;
-        case 4 :
-          validateFourArguments(arguments);
-          break;
-        default:
-          break;
+      
+      for (var i in arguments) {
+        switch (typeof arguments[i]){
+          case 'string' :
+            self.container = arguments[i];
+            break;
+          case 'number' : 
+            if (typeof self.latitude === 'undefined'){
+              self.latitude = arguments[i];
+            } else { 
+              self.longitude = arguments[i];
+            }
+            break;
+          case 'object' :
+            self.mapOptions = arguments[i];
+          case 'function':
+            self.callBack = arguments[i];
+          default:
+            break;
+        }
       }
 
-     
+      if (typeof self.latitude === 'undefined'){
+        self.latitude = 25.670708;
+        self.longitude = -100.308172;
+      }
 
-      if (typeof window.initialize == 'undefined'){
+       if (typeof self.container === 'undefined'){
+        container = 'map-canvas';
+      }
+
+      if (typeof window.initialize === 'undefined'){
     		window.initialize = self.initialize;
     	}
     	
@@ -40,14 +54,16 @@ var GDGMaps = (function (latitude, longitude, options, callback) {
     initialize =  function  () {
       if(typeof self.mapOptions === 'undefined'){
         self.mapOptions = {
-          center: new google.maps.LatLng(25.6707040, -100.3081316),
+          center: new google.maps.LatLng(self.latitude, self.longitude),
           zoom: 8,
           mapTypeId: google.maps.MapTypeId.ROADMAP
         }
+      }else{
+        configureMap(self.mapOptions);
       }
 
   		self.map = new google.maps.Map(
-        document.getElementById('map-canvas'),
+        document.getElementById(container),
   		  self.mapOptions
       );
 
@@ -57,62 +73,12 @@ var GDGMaps = (function (latitude, longitude, options, callback) {
 
     }
 
-    function validateOneArgument () {
-      switch (typeof arguments[0]){
-        case 'function' : 
-          self.callBack = arguments[0];
-          break;
-        case 'object' :
-          self.mapOptions = arguments[0];
-          break;
-        default:
-          break;
-      }
+
+    function configureMap (options) {
+
+      
     }
 
-    function validateTwoArguments () {
-      if (typeof arguments[0] === 'number' && typeof arguments[1] === 'number'){
-        mapOptions['center'] = new google.maps.LatLng(arguments[0], larguments[1]);
-      } else{
-        setMapConfiguration(arguments);
-      }
-    }
-
-    function validateThreeArguments () {
-      if (typeof arguments[0] === 'number' && typeof arguments[1] === 'number'){
-        mapOptions['center'] = new google.maps.LatLng(arguments[0], arguments[1]);
-        validateOneArgument(arguments[2]);
-      }else{
-        if (typeof arguments[1] === 'number' && typeof arguments[2] === 'number'){
-          mapOptions['center'] = new google.maps.LatLng(arguments[1], arguments[2]);
-          validateOneArgument(arguments[0]);
-        }
-      }
-    }
-
-    function validateFourArguments () {
-      if (typeof arguments[0] === 'number' && typeof arguments[1] === 'number'){
-        mapOptions['center'] = new google.maps.LatLng(arguments[0], arguments[1]);
-        setMapConfiguration(arguments[2],arguments[3]);
-      }else{
-        if (typeof arguments[2] === 'number' && typeof arguments[3] === 'number'){
-          mapOptions['center'] = new google.maps.LatLng(arguments[2], arguments[3]);
-          setMapConfiguration(arguments[0],arguments[1]);
-        }
-      }
-    }
-
-    function setMapConfiguration () {
-      if (typeof arguments[0] === 'object' && typeof arguments[1] === 'function' ){
-            self.mapOptions = arguments[0];
-            self.callBack = arguments[1];
-      }else{
-        if (typeof arguments[0] === 'function' && typeof arguments[1] === 'object' ) {
-          self.callBack = arguments[0];
-          self.mapOptions = arguments[1];
-        }
-      }  
-    }
 
     function loadMap () {
     	var script = document.createElement('script');
@@ -130,4 +96,4 @@ var GDGMaps = (function (latitude, longitude, options, callback) {
     return api;
 })();
 
-var instance = new GDGMaps();
+var instance = new DMaps(20.821805, -101.147430,calli);
